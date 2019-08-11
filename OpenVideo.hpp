@@ -1,32 +1,20 @@
+//  OpenVideo.hpp
+//  VisionProcessing2019
 //
-//  OpenVideo.h
-//  cameraSettingsLibUVC
-//
-//  Created by Margaret Peterson on 11/10/18.
-//  Copyright © 2018 Margaret Peterson. All rights reserved.
+//  Created by Margaret Peterson on 1/14/19.
+//  Copyright © 2019 Margaret Peterson. All rights reserved.
 //
 
-#ifndef OpenVideo_h
-#define OpenVideo_h
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdocumentation"
-
+#ifndef OpenVideo_hpp
+#define OpenVideo_hpp
 
 #include "opencv2/core.hpp"
 #include "opencv2/imgproc.hpp"
 #include "opencv2/highgui.hpp"
 #include "opencv2/videoio.hpp"
-
 #include <iostream>
-#include "libuvc/libuvc.h"
-#include <stdio.h>
 #include <unistd.h>
-
-//C++
-#include <cstdlib>
-#include <fstream>
-#include <iostream>
-#include <sstream>
+#include "libuvc/libuvc.h" //has to be libuvc/libuvc.h in pi
 
 using namespace cv;
 using namespace std;
@@ -34,15 +22,14 @@ using namespace std;
 #endif /* OpenVideo_h */
 
 class OpenVideo {
-    
-public:
-    OpenVideo(int camNum);
-    static void cb(uvc_frame_t *frame, void *ptr);
-    Mat getImage();
-    
-private:
-    void ChangeExposure();
-    int webCamIndex;
-    VideoCapture *capture;
-};
 
+public:
+   OpenVideo(int camNum);
+   Mat getImage();
+
+private:
+   void ChangeExposure();
+   int webCamIndex;
+   static void cb(uvc_frame_t *frame, void *ptr);
+   VideoCapture *capture;
+};

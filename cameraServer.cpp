@@ -1,7 +1,4 @@
-#include "opencv2/core.hpp"
-#include "opencv2/imgproc.hpp"
-#include "opencv2/highgui.hpp"
-#include "opencv2/videoio.hpp"
+
 #include <sys/time.h>
 #include <time.h>
 #include <iostream>
@@ -9,7 +6,6 @@
 #include <vector>
 #include "OpenVideo.hpp"
 
-#include <unistd.h> 
 #include <stdio.h> 
 #include <sys/socket.h> 
 #include <stdlib.h> 
@@ -28,33 +24,10 @@ int main()
     int opt = 1; 
     int addrlen = sizeof(address); 
     char buffer[BUFFER_SIZE] = {0}; 
-    const char *hello = "Hello from server"; 
-
-    //text settings
-    string text = "Test String";
-    
-    int tBoxPosX = 20,
-        tBoxPosY = 20,
-        tBoxBorderThickness = 1,
-        tBoxFont = FONT_HERSHEY_COMPLEX_SMALL,
-        tBoxBaseline = 0;
-
-    double tBoxFontScale =1;
-
-    Scalar textColor(255,50,55);
-
-    //calc dependant varsmak
-    Size tBoxBorderSize;
 
     //opencv data vars
     VideoCapture capture; //camera feed
-    Mat currImg,          //output Image    
-        textForground,    //text color layer
-        textAlpha,        //text draw layer
-        image_roi;        //roi of output image
-
-
-
+    Mat currImg;
 
      // Creating socket file descriptor 
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) 
@@ -96,39 +69,22 @@ int main()
     struct timeval currFrameTime,lastFrameTime;
     gettimeofday(&currFrameTime, NULL);
 
-	cout << "starting video";
     OpenVideo myVideo(0);
    
         cout << "Capture is opened" << endl;
         while(waitKey(10) != 'q')
         {
-            gettimeofday(&currFrameTime, NULL);
-            //calculate timing data
-            long int ms =(currFrameTime.tv_sec * 1000 + currFrameTime.tv_usec / 1000) - (lastFrameTime.tv_sec * 1000 + lastFrameTime.tv_usec / 1000) ;
-            text =   "Proc time: "+ to_string((float)(currTime - startTime) /CLOCKS_PER_SEC) + " FPS: " + to_string((float)(1000.0/ ms));
-            lastFrameTime = currFrameTime;
-
-
-            
             //grab image from camera
             currImg = myVideo.getImage();
             if(currImg.empty())
                 break;
 
-            //log the cpu clock after alloc and draw
-            
-
             //send images 
             Size imageSize = currImg.size();
-            string output;
-            static int frameNumber =0;
-            output =  to_string(imageSize.width) + to_string(imageSize.height) + ":" +
-                    to_string(imageSize.width * imageSize.height * 3) + "?";
-            cout << "Frame Number: " << frameNumber++ << " " << text <<endl;
+
             int datalen = imageSize.width * imageSize.height * 3, currPos = 0;
             int packetSize = imageSize.width;
             int currPacket; 
-            startTime = clock();
             while(currPos < datalen)
             {
                 if(currPos + packetSize > datalen)
@@ -139,7 +95,6 @@ int main()
                 send(new_socket, currImg.data + currPos, currPacket, 0);
                 currPos += currPacket;
             }
-            currTime = clock();
 
         }
     
